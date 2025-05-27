@@ -160,45 +160,41 @@ export default function App() {
   };
 
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body>
-        <ThemeProvider defaultTheme="system" storageKey="devbox-ui-theme">
-          <SidebarProvider>
-            <AppSidebar
-              selectedService={selectedService}
-              onServiceSelect={setSelectedService}
-              currentPage={currentPage}
-              onPageChange={setCurrentPage}
-            />
-            <SidebarInset>
-              <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-                <SidebarTrigger className="-ml-1" />
-                <Separator orientation="vertical" className="mr-2 h-4" />
-                <div className="flex items-center gap-2 flex-1">
-                  <h1 className="font-semibold capitalize">{currentPage}</h1>
-                </div>
-                <ModeToggle />
-              </header>
-              <div className="flex flex-1 flex-col gap-4 p-4 pt-6">
-                {renderPageContent()}
-              </div>
-            </SidebarInset>
-          </SidebarProvider>
-          <Toaster
-            position="top-right"
-            richColors
-            closeButton={false}
-            toastOptions={{
-              className: "bg-background",
-              duration: 3000,
-              style: {
-                fontSize: "14px",
-                padding: "8px 12px",
-              },
-            }}
-          />
-        </ThemeProvider>
-      </body>
-    </html>
+    <ThemeProvider defaultTheme="system" storageKey="devbox-ui-theme">
+      <SidebarProvider>
+        <AppSidebar
+          selectedService={selectedService}
+          onServiceSelect={setSelectedService}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+        />
+        <SidebarInset>
+          <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            <div className="flex items-center gap-2 flex-1">
+              <h1 className="font-semibold capitalize">{currentPage}</h1>
+            </div>
+            <ModeToggle />
+          </header>
+          <div className="flex flex-1 flex-col gap-4 p-4 pt-6">
+            {renderPageContent()}
+          </div>
+        </SidebarInset>
+      </SidebarProvider>
+      <Toaster
+        position="top-right"
+        richColors
+        closeButton={false}
+        toastOptions={{
+          className: "bg-background",
+          duration: 3000,
+          style: {
+            fontSize: "14px",
+            padding: "8px 12px",
+          },
+        }}
+      />
+    </ThemeProvider>
   );
 }

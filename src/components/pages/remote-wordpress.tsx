@@ -204,31 +204,35 @@ export function RemoteWordPress() {
 
     setLoading(true);
     try {
-      // Simulate API call to create post
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      const newPost: WordPressPost = {
-        id: Date.now(),
-        title: { rendered: postFormData.title },
-        content: { rendered: `<p>${postFormData.content}</p>` },
-        excerpt: { rendered: `<p>${postFormData.excerpt}</p>` },
-        status: postFormData.status,
-        date: new Date().toISOString(),
-        modified: new Date().toISOString(),
-        author: 1,
-        categories: postFormData.categories,
-        tags: postFormData.tags,
-        slug: postFormData.title.toLowerCase().replace(/\s+/g, "-"),
-        link: `${selectedSite.url}/${postFormData.title
-          .toLowerCase()
-          .replace(/\s+/g, "-")}`,
-      };
-
-      setPosts((prev) => [newPost, ...prev]);
+      const url = `${selectedSite.url.replace(/\/$/, "")}/wp-json/wp/v2/posts`;
+      const auth = btoa(
+        `${selectedSite.username}:${selectedSite.application_password}`
+      );
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Basic ${auth}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: postFormData.title,
+          content: postFormData.content,
+          excerpt: postFormData.excerpt,
+          status: postFormData.status,
+          categories: postFormData.categories,
+          tags: postFormData.tags,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to create post: ${response.statusText}`);
+      }
+      toast.success("Post created!");
       setShowPostDialog(false);
       resetPostForm();
+      await fetchPostsForSite(selectedSite);
     } catch (error) {
       console.error("Failed to create post:", error);
+      toast.error("Failed to create post.");
     } finally {
       setLoading(false);
     }
@@ -239,28 +243,38 @@ export function RemoteWordPress() {
 
     setLoading(true);
     try {
-      // Simulate API call to update post
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      const updatedPost: WordPressPost = {
-        ...editingPost,
-        title: { rendered: postFormData.title },
-        content: { rendered: `<p>${postFormData.content}</p>` },
-        excerpt: { rendered: `<p>${postFormData.excerpt}</p>` },
-        status: postFormData.status,
-        modified: new Date().toISOString(),
-        categories: postFormData.categories,
-        tags: postFormData.tags,
-      };
-
-      setPosts((prev) =>
-        prev.map((post) => (post.id === editingPost.id ? updatedPost : post))
+      const url = `${selectedSite.url.replace(/\/$/, "")}/wp-json/wp/v2/posts/${
+        editingPost.id
+      }`;
+      const auth = btoa(
+        `${selectedSite.username}:${selectedSite.application_password}`
       );
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          Authorization: `Basic ${auth}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: postFormData.title,
+          content: postFormData.content,
+          excerpt: postFormData.excerpt,
+          status: postFormData.status,
+          categories: postFormData.categories,
+          tags: postFormData.tags,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to update post: ${response.statusText}`);
+      }
+      toast.success("Post updated!");
       setShowPostDialog(false);
       setEditingPost(null);
       resetPostForm();
+      await fetchPostsForSite(selectedSite);
     } catch (error) {
       console.error("Failed to update post:", error);
+      toast.error("Failed to update post.");
     } finally {
       setLoading(false);
     }
@@ -271,11 +285,27 @@ export function RemoteWordPress() {
 
     setLoading(true);
     try {
-      // Simulate API call to delete post
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setPosts((prev) => prev.filter((post) => post.id !== postId));
+      const url = `${selectedSite.url.replace(
+        /\/$/,
+        ""
+      )}/wp-json/wp/v2/posts/${postId}?force=true`;
+      const auth = btoa(
+        `${selectedSite.username}:${selectedSite.application_password}`
+      );
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Basic ${auth}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to delete post: ${response.statusText}`);
+      }
+      toast.success("Post deleted!");
+      await fetchPostsForSite(selectedSite);
     } catch (error) {
       console.error("Failed to delete post:", error);
+      toast.error("Failed to delete post.");
     } finally {
       setLoading(false);
     }
