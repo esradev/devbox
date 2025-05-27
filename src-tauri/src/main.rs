@@ -25,10 +25,8 @@ fn get_sites_file() -> Result<std::path::PathBuf, String> {
 #[tauri::command]
 fn save_site(mut site: SiteData) -> Result<(), String> {
     let sites_file = get_sites_file()?;
-    println!("Saving site to: {:?}", sites_file);
     let mut sites: Vec<SiteData> = if sites_file.exists() {
         let content = std::fs::read_to_string(&sites_file).map_err(|e| e.to_string())?;
-        println!("Existing file content: {}", content);
         serde_json::from_str(&content).unwrap_or_default()
     } else {
         vec![]
@@ -41,8 +39,6 @@ fn save_site(mut site: SiteData) -> Result<(), String> {
     sites.push(site);
 
     let serialized = serde_json::to_string_pretty(&sites).map_err(|e| e.to_string())?;
-    println!("Writing file content: {}", serialized);
-
     std::fs::write(&sites_file, &serialized).map_err(|e| e.to_string())?;
 
     Ok(())
@@ -51,14 +47,11 @@ fn save_site(mut site: SiteData) -> Result<(), String> {
 #[tauri::command]
 fn load_sites() -> Result<Vec<SiteData>, String> {
     let sites_file = get_sites_file()?;
-    println!("Loading sites from: {:?}", sites_file);
     if sites_file.exists() {
         let content = std::fs::read_to_string(&sites_file).map_err(|e| e.to_string())?;
-        println!("Loaded file content: {}", content);
         let sites: Vec<SiteData> = serde_json::from_str(&content).unwrap_or_default();
         Ok(sites)
     } else {
-        println!("Sites file does not exist.");
         Ok(vec![])
     }
 }

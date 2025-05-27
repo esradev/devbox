@@ -133,52 +133,40 @@ export function RemoteWordPress() {
     loadSites();
   }, []);
 
-  // Mock posts data (keep as is for now)
+  // Fetch real posts for the selected site
+  const fetchPostsForSite = async (site: RemoteWordPressSite) => {
+    setLoading(true);
+    try {
+      const url = `${site.url.replace(
+        /\/$/,
+        ""
+      )}/wp-json/wp/v2/posts?per_page=20&_embed`;
+      const auth = btoa(`${site.username}:${site.application_password}`);
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Basic ${auth}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch posts: ${response.statusText}`);
+      }
+      const posts = await response.json();
+      setPosts(posts);
+    } catch (error) {
+      console.error("Failed to fetch posts:", error);
+      setPosts([]);
+      toast.error("Failed to fetch posts from WordPress site.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch posts when selectedSite changes
   useEffect(() => {
     if (selectedSite) {
-      const mockPosts: WordPressPost[] = [
-        {
-          id: 1,
-          title: { rendered: "Getting Started with WordPress REST API" },
-          content: {
-            rendered:
-              "<p>This is a comprehensive guide to using the WordPress REST API...</p>",
-          },
-          excerpt: {
-            rendered:
-              "<p>Learn how to use the WordPress REST API effectively...</p>",
-          },
-          status: "publish",
-          date: "2024-01-15T10:30:00",
-          modified: "2024-01-15T11:00:00",
-          author: 1,
-          categories: [1, 3],
-          tags: [5, 8, 12],
-          slug: "getting-started-wordpress-rest-api",
-          link: "https://myblog.com/getting-started-wordpress-rest-api",
-        },
-        {
-          id: 2,
-          title: { rendered: "Advanced WordPress Development Tips" },
-          content: {
-            rendered:
-              "<p>Here are some advanced tips for WordPress development...</p>",
-          },
-          excerpt: {
-            rendered:
-              "<p>Discover advanced techniques for WordPress development...</p>",
-          },
-          status: "draft",
-          date: "2024-01-14T15:20:00",
-          modified: "2024-01-14T16:45:00",
-          author: 1,
-          categories: [2],
-          tags: [3, 7, 9],
-          slug: "advanced-wordpress-development-tips",
-          link: "https://myblog.com/advanced-wordpress-development-tips",
-        },
-      ];
-      setPosts(mockPosts);
+      fetchPostsForSite(selectedSite);
+    } else {
+      setPosts([]);
     }
   }, [selectedSite]);
 
