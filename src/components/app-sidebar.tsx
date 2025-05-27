@@ -12,6 +12,7 @@ import {
   Container,
   FileText,
   Activity,
+  Cloud,
 } from "lucide-react";
 
 import {
@@ -34,6 +35,7 @@ const navigationItems = [
   { name: "Dashboard", icon: LayoutDashboard, id: "dashboard" },
   { name: "Services", icon: Server, id: "services" },
   { name: "WordPress", icon: Globe, id: "wordpress" },
+  { name: "Remote WordPress", icon: Cloud, id: "remote-wordpress" },
   { name: "Containers", icon: Container, id: "containers" },
   { name: "Logs", icon: FileText, id: "logs" },
   { name: "Monitoring", icon: Activity, id: "monitoring" },

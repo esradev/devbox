@@ -17,6 +17,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { ModeToggle } from "@/components/mode-toggle";
 import { ThemeProvider } from "@/components/theme-provider";
+import { RemoteWordPress } from "./components/pages/remote-wordpress";
+import { Toaster } from "@/components/ui/sonner";
 
 // Mock service data for Dashboard
 const mockServices = [
@@ -142,6 +144,8 @@ export default function App() {
         } else {
           return <WordPress onNavigate={handleWordPressNavigate} />;
         }
+      case "remote-wordpress":
+        return <RemoteWordPress />;
       case "containers":
         return <Containers />;
       case "logs":
@@ -156,28 +160,45 @@ export default function App() {
   };
 
   return (
-    <ThemeProvider defaultTheme="system" storageKey="devbox-ui-theme">
-      <SidebarProvider>
-        <AppSidebar
-          selectedService={selectedService}
-          onServiceSelect={setSelectedService}
-          currentPage={currentPage}
-          onPageChange={setCurrentPage}
-        />
-        <SidebarInset>
-          <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            <div className="flex items-center gap-2 flex-1">
-              <h1 className="font-semibold capitalize">{currentPage}</h1>
-            </div>
-            <ModeToggle />
-          </header>
-          <div className="flex flex-1 flex-col gap-4 p-4 pt-6">
-            {renderPageContent()}
-          </div>
-        </SidebarInset>
-      </SidebarProvider>
-    </ThemeProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider defaultTheme="system" storageKey="devbox-ui-theme">
+          <SidebarProvider>
+            <AppSidebar
+              selectedService={selectedService}
+              onServiceSelect={setSelectedService}
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
+            />
+            <SidebarInset>
+              <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+                <SidebarTrigger className="-ml-1" />
+                <Separator orientation="vertical" className="mr-2 h-4" />
+                <div className="flex items-center gap-2 flex-1">
+                  <h1 className="font-semibold capitalize">{currentPage}</h1>
+                </div>
+                <ModeToggle />
+              </header>
+              <div className="flex flex-1 flex-col gap-4 p-4 pt-6">
+                {renderPageContent()}
+              </div>
+            </SidebarInset>
+          </SidebarProvider>
+          <Toaster
+            position="top-right"
+            richColors
+            closeButton={false}
+            toastOptions={{
+              className: "bg-background",
+              duration: 3000,
+              style: {
+                fontSize: "14px",
+                padding: "8px 12px",
+              },
+            }}
+          />
+        </ThemeProvider>
+      </body>
+    </html>
   );
 }
